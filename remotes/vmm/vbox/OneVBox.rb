@@ -124,6 +124,7 @@ class OneVBox
             rc = OpenNebula.exec_and_log("#{VBOX_STORAGECTL} #{@vmname} --name ONE-#{controller} --add #{controller}")
             break if rc
         end
+        OpenNebula.exec_and_log("#{VBOX_STORAGECTL} #{@vmname} --name ONE-context-ide --add ide")
         rc
     end
 
