@@ -209,6 +209,16 @@ module OneVBoxXMLParser
         end
     end
 
+    def convert_extension type
+        type = type.downcase
+        case type
+        when "disk" then return ""
+        when "file" then return ""
+        when "dvd" then return ".iso"
+        when "cdrom" then return ".iso"
+        else return nil
+        end
+    end
 
     def disk_locations
         disk_number = 0
@@ -239,7 +249,7 @@ module OneVBoxXMLParser
                 storageattach_args << "--port #{port_number target.text} "
                 storageattach_args << "--device 0 "
                 storageattach_args << "--type #{convert_type type.text} "
-                storageattach_args << "--medium #{basedir}/disk.#{disk_number} "
+                storageattach_args << "--medium #{basedir}/disk.#{disk_number}#{convert_extension type.text} "
                 readonly = disk.elements["READONLY"]
                 storageattach_args << (readonly.text == "yes"? "--mtype immutable " : "--mtype normal ") if readonly
 
@@ -253,6 +263,16 @@ module OneVBoxXMLParser
             disk_number += 1
 
         end #each_element
+        @xml_root.each_element('CONTEXT') do |context|
+            storageattach_args = @vmname
+            storageattach_args += " --storagectl ONE-context-ide "
+            storageattach_args += "--port 1 "
+            storageattach_args += "--device 0 "
+            storageattach_args += "--type dvddrive "
+            storageattach_args += "--medium #{basedir}/disk.1.iso "
+
+            storageattach_args_array << storageattach_args
+        end
 
         return storageattach_args_array
     end
